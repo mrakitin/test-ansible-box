@@ -1,0 +1,60 @@
+name: vagrant-up
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  vagrant-up:
+    name: Run test-ansible-box
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Set env vars
+        run: |
+          export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+
+      - name: Checkout the code
+        uses: actions/checkout@v2
+
+      - name: Install VirtualBox
+        run: |
+          # For reference: https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html.
+          set -vxeuo pipefail
+          sudo apt-get -y update
+          sudo apt-get -y install virtualbox
+          # Note: this installation may require interactive response.
+          # sudo apt-get -y install virtualbox—ext–pack
+
+      - name: Install vagrant
+        run: |
+          set -vxeuo pipefail
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install vagrant
+
+      - name: Show Vagrant version
+        run: vagrant --version
+
+      - name: Install vagrant plugins
+        run: |
+          set -vxeuo pipefail
+          vagrant plugin install vagrant-vbguest
+          vagrant plugin install vagrant-disksize
+
+      - name: vagrant up
+        run: |
+          set -vxeuo pipefail
+          vagrant up
+
+      - name: vagrant ssh
+        run: |
+          set -vxeuo pipefail
+          vagrant ssh -c "echo 'Hello, World!'"
