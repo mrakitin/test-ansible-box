@@ -2,7 +2,7 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "bento/centos-7.2"
   config.vm.box_version = "2.3.1"
-  config.disksize.size = '50GB'
+  config.disksize.size = "50GB"
   config.vm.hostname = "test-ansible-box"
   # config.vm.network "private_network", ip: "10.10.10.10"
   config.vm.provider "virtualbox" do |v|
