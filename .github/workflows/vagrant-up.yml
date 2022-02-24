@@ -7,7 +7,7 @@ on:
 jobs:
   vagrant-up:
     name: Run test-ansible-box
-    runs-on: ubuntu-latest
+    runs-on: macos-10.15
     strategy:
       fail-fast: false
 
@@ -24,23 +24,15 @@ jobs:
       - name: Checkout the code
         uses: actions/checkout@v2
 
-      - name: Install VirtualBox
-        run: |
-          # For reference: https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html.
-          set -vxeuo pipefail
-          sudo apt-get -y update
-          sudo apt-get -y install virtualbox
-          # Note: this installation may require interactive response.
-          # sudo apt-get -y install virtualbox—ext–pack
+      - name: Cache vagrant boxes
+        uses: actions/cache@v2
+        with:
+          path: ~/.vagrant.d/boxes
+          key: ${{ runner.os }}-vagrant-${{ hashFiles('Vagrantfile') }}
+          restore-keys: |
+            ${{ runner.os }}-vagrant-
 
-      - name: Install vagrant
-        run: |
-          set -vxeuo pipefail
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get update && sudo apt-get install vagrant
-
-      - name: Show Vagrant version
+      - name: Show vagrant version
         run: vagrant --version
 
       - name: Install vagrant plugins
