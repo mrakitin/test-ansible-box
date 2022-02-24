@@ -21,6 +21,9 @@ jobs:
           export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
           echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
 
+          export VAGRANT_DISABLE_VBOXSYMLINKCREATE=1
+          echo "VAGRANT_DISABLE_VBOXSYMLINKCREATE=${VAGRANT_DISABLE_VBOXSYMLINKCREATE}" >> $GITHUB_ENV
+
       - name: Checkout the code
         uses: actions/checkout@v2
 
